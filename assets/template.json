@@ -1,0 +1,41 @@
+{
+ "size": [
+  2480,
+  3508
+ ],
+ "bg": [
+  0,
+  0,
+  0
+ ],
+ "ink_color": [
+  255,
+  255,
+  255
+ ],
+ "frame": [
+  106,
+  661,
+  2372,
+  3056
+ ],
+ "font_size": 82,
+ "slots": {
+  "model": {
+   "x": 519,
+   "y": 470,
+   "align": "left"
+  },
+  "width": {
+   "x": 1691,
+   "y": 469,
+   "align": "right"
+  },
+  "height": {
+   "x": 2309,
+   "y": 470,
+   "align": "right"
+  }
+ },
+ "source": "assets/template.jpg"
+}

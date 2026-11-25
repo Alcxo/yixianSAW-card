@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="壹线样卡">
+<meta name="format-detection" content="telephone=no">
+<title>壹线样卡 · 手机版</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="hdr">
+  <div class="logo">壹线</div>
+  <div class="hdr-txt">
+    <h1>样卡生成器</h1>
+    <p>只靠手机 · 不用电脑</p>
+  </div>
+  <span class="engine" id="enginePill">引擎待启动</span>
+</header>
+
+<main>
+  <section class="card">
+    <div class="card-hd"><span class="num">1</span><b>花边照片</b><span class="count" id="photoCount">未选择</span></div>
+    <label class="pick" for="filePhotos">
+      <span class="pick-ico">＋</span>
+      <span class="pick-txt"><b>从相册选择 / 拍照</b><small>可以一次选很多张，HEIC 也支持</small></span>
+      <input id="filePhotos" type="file" accept="image/*" multiple hidden>
+    </label>
+    <div class="plist" id="photoList"></div>
+    <p class="tip">文件名就是<strong>型号</strong>；手机拍的照片名字是 IMG_1234，<strong>点型号可以直接改</strong>。</p>
+  </section>
+
+  <section class="card">
+    <div class="card-hd"><span class="num">2</span><b>规格表</b><span class="count">可选</span></div>
+    <label class="pick slim" for="fileTable">
+      <span class="pick-ico">▤</span>
+      <span class="pick-txt"><b id="tableName">选择产品信息表</b><small>从「文件」里选 xlsx / xls / csv</small></span>
+      <input id="fileTable" type="file" accept=".xlsx,.xls,.csv,text/csv" hidden>
+    </label>
+    <button class="link" id="clearTable" hidden>清空表格</button>
+    <p class="tip">不选也行：型号照样写在卡上，花宽 / 花高留空。</p>
+  </section>
+
+  <section class="card">
+    <div class="card-hd"><span class="num">3</span><b>模板</b><span class="count" id="templateState">使用默认</span></div>
+    <div class="tplrow">
+      <div class="tplname" id="templateName">模版.jpg</div>
+      <label class="btn small" for="fileTemplate">换模板
+        <input id="fileTemplate" type="file" accept="image/*" hidden>
+      </label>
+    </div>
+    <p class="tip">一般不用换。换新模板会重新识别虚线框和填写位。</p>
+  </section>
+
+  <section class="card">
+    <div class="card-hd"><span class="num">4</span><b>排版</b></div>
+    <div class="seg" id="segMode">
+      <button data-mode="auto" class="on">自动</button>
+      <button data-mode="fill">满幅</button>
+      <button data-mode="single">单条</button>
+      <button data-mode="double">并列</button>
+    </div>
+    <div class="slider">
+      <div class="slider-hd"><span>有色占比</span><output id="covVal">45%</output></div>
+      <input id="cov" type="range" min="25" max="75" step="1" value="45">
+    </div>
+    <label class="switch">
+      <span><b>换色卡标「换色」</b><small>黑色花边反成白色时，右下角加角标</small></span>
+      <input type="checkbox" id="swapNote" checked>
+    </label>
+  </section>
+
+  <div class="err" id="errBox" hidden></div>
+
+  <section class="card diag" id="diag" hidden>
+    <div class="card-hd"><span class="num">!</span><b>引擎没加载成功</b></div>
+    <pre id="diagText"></pre>
+    <div class="diag-actions">
+      <button class="btn small" id="diagCopy">复制信息</button>
+      <button class="btn small" id="diagRetry">重试加载</button>
+    </div>
+    <p class="tip">把上面这段信息发给我，就能定位问题。</p>
+  </section>
+
+  <section class="card" id="prog" hidden>
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="prog-txt"><span id="progText">正在准备…</span><button class="link" id="cancelBtn">取消</button></div>
+  </section>
+
+  <section id="result" hidden>
+    <div class="card-hd res-hd"><span class="num ok">✓</span><b>生成结果</b><span class="count" id="summary"></span></div>
+    <div class="res-grid" id="grid"></div>
+    <div class="res-actions">
+      <button class="btn primary block" id="saveAll">保存全部到相册</button>
+      <p class="tip center">点开任意一张 → 长按图片 →「存储图像」，也可以点「保存」逐张存。</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>壹线样卡 · 手机独立版</span>
+    <span id="verInfo"></span>
+  </footer>
+</main>
+
+<div class="actionbar">
+  <button class="go" id="goBtn">生成样卡</button>
+</div>
+
+<!-- 大图预览 -->
+<div class="viewer" id="viewer" hidden>
+  <div class="viewer-bar">
+    <span id="viewerName"></span>
+    <button class="viewer-x" id="viewerClose">关闭</button>
+  </div>
+  <div class="viewer-body"><img id="viewerImg" alt=""></div>
+  <div class="viewer-foot">
+    <button class="btn primary block" id="viewerSave">保存到相册</button>
+    <p class="tip center">存不上时：长按上面的图片 →「存储图像」</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
